@@ -1,0 +1,1 @@
+addpath(genpath('/home/mike/Documents/MATLAB'));
