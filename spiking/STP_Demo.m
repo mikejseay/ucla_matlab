@@ -2,7 +2,7 @@
 % USES IAF_STP.m
 
 % init vals
-U_init = 0.25;
+u_init = 0.25;
 tFac_init = 100;
 tRec_init = 20;
 
@@ -57,13 +57,13 @@ button1 = uicontrol('units', 'normal', 'style', 'pushbutton', 'fontsize', 14, ..
 % resetbutton = uicontrol('units', 'normal', 'style', 'pushbutton', 'String', 'RESET', 'position', [0.05, 0.05, 0.1, 0.08], 'Callback', 'XOR_demo;');
 
 %Parameters
-P1 = uicontrol('units', 'normal', 'style', 'edit', 'String', num2str(U_init), 'position', [0.25, 0.8, 0.07, 0.05]);
+P1 = uicontrol('units', 'normal', 'style', 'edit', 'String', num2str(u_init), 'position', [0.25, 0.8, 0.07, 0.05]);
 P2 = uicontrol('units', 'normal', 'style', 'edit', 'String', num2str(tFac_init), 'position', [0.4, 0.8, 0.07, 0.05]);
 P3 = uicontrol('units', 'normal', 'style', 'edit', 'String', num2str(tRec_init), 'position', [0.55, 0.8, 0.07, 0.05]);
 P4 = uicontrol('units', 'normal', 'style', 'edit', 'String', num2str(spikeTimes_init), 'position', [0.7, 0.8, 0.12, 0.05]);
 
 %Text labels for Parameters
-T1 = uicontrol('units', 'normal', 'style', 'text', 'String', 'U_init', ...
+T1 = uicontrol('units', 'normal', 'style', 'text', 'String', 'u', ...
     'fontsize', [10], 'foregroundcolor', 'k', ...
     'fontweight', 'bold', 'position', [0.25, 0.87, 0.07, 0.04]);
 T2 = uicontrol('units', 'normal', 'style', 'text', 'String', 'tFac', ...
@@ -79,14 +79,14 @@ T4 = uicontrol('units', 'normal', 'style', 'text', 'String', 'Spike Times', ...
 %LEGENDS
 L1 = uicontrol('units', 'normal', 'style', 'text', 'String', 'Presyn. Potential I', ...
     'fontsize', [14], 'foregroundcolor', 'c', ...
-    'fontweight', 'bold', 'position', [0.55, 0.7, 0.14, 0.04]);
+    'fontweight', 'bold', 'position', [0.5, 0.7, 0.18, 0.04]);
 L2 = uicontrol('units', 'normal', 'style', 'text', 'String', 'U - Util. (Release Prob.)', ...
     'fontsize', [14], 'foregroundcolor', 'g', ...
-    'fontweight', 'bold', 'position', [0.25, 0.7, 0.14, 0.04]);
+    'fontweight', 'bold', 'position', [0.1, 0.7, 0.18, 0.04]);
 L3 = uicontrol('units', 'normal', 'style', 'text', 'String', 'R - Resources', ...
     'fontsize', [14], 'foregroundcolor', 'r', ...
-    'fontweight', 'bold', 'position', [0.4, 0.7, 0.14, 0.04]);
+    'fontweight', 'bold', 'position', [0.3, 0.7, 0.18, 0.04]);
 L4 = uicontrol('units', 'normal', 'style', 'text', 'String', 'Postsyn. V', ...
     'fontsize', [14], 'foregroundcolor', 'k', ...
-    'fontweight', 'bold', 'position', [0.7, 0.7, 0.14, 0.04]);
+    'fontweight', 'bold', 'position', [0.7, 0.7, 0.18, 0.04]);
 

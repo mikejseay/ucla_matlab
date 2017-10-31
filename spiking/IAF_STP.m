@@ -1,9 +1,10 @@
-function IAF_STP(t, spiketimes, u, tfac, trec, in)
+function IAF_STP(t, spiketimes, u_init, tfac, trec, in)
 % Self-Contained function to Study the Markram/Tsodyks Model
 
 % t: time vector in ms
 % spiketimes: spike times in ms
-% u: util constant (how much is released)
+% u_init: initial utilization
+% U: maximum utilization increase
 % tfac: time constant of facilitation
 % trec: time constant of depression
 % in = injected current (vector size t)
@@ -23,6 +24,8 @@ function IAF_STP(t, spiketimes, u, tfac, trec, in)
 do_plot = true;
 tau = 5;                            % membrane time constant
 SpikeAmp = 2;                       % spike amplitude
+U = u_init;                         % maximum utilization increase
+% U = 0.1;
 Iin = zeros(1, length(t)) + in; 
 
 %%% VARIABLES %%%
@@ -35,9 +38,12 @@ v = 0;                              % initial voltage, 0 so it can be plotted al
 
 % set initial values of time vectors
 resources(1) = r;                   % synaptic resources
+u = 0;
+curr = 0;
+% u = U;
 util(1) = u;                        % utilization level (release probability)
 produc(1) = r * u;                  % product of the two above
-% rP = r;
+rP = r;
 
 for t = 2:length(t)
     
@@ -54,14 +60,15 @@ for t = 2:length(t)
     
     % calculate change in R and U
     % for more complete description, see below
-    uP = u + u * (1 - u) * exp(-ipi/tfac);
-    rP = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
-    urP = uP * rP;
+%     uP = u + U * (1 - u) * exp(-ipi/tfac);
+%     urP = uP * rP;
+%     rP = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+%     urP = uP * rP;
     
     % record values
-    util(t) = uP;
-    resources(t) = rP;
-    produc(t) = urP;
+%     util(t) = uP;
+%     resources(t) = rP;
+%     produc(t) = urP;
     
     % if spiking, actually change the R and U vals
     % NOTE: this means that r and u only change after spikes
@@ -69,47 +76,54 @@ for t = 2:length(t)
         
         % change in utilization following spike
         % eqn 2.3 from Tsodyks et al. (1998)
-        u = u + u * (1 - u) * exp(-ipi/tfac);
-              
-        % change in resources following spike
-        % solved version of differential equation in (1) of
-        % http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
-        r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+%         u = u + U * (1 - u) * exp(-ipi/tfac);
+        u = u - u / tfac + U * (1 - u);
         
-        % the presynaptic current will be their product
-        presyni(t) = r * u;
+        % the presynaptic maximal current will be their product
+%         presyni(t) = r * u;
+        curr = curr - curr / tau + u * r;
+        
+        % change in resources following spike
+        % solved version of second differential equation in (1) of
+        % http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
+%         r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+        r = r + (1 - r) / trec - u * r;
+        
+        
+        % the presynaptic maximal current will be their product
+%         presyni(t) = r * u;
         
         % update lastspike to be the new spike time
         lastspike = spiketimes(spike);
         
     else
+        u = u - u / tfac;
+        curr = curr - curr / tau;
+        r = r + (1 - r) / trec;
         presyni(t) = 0;
     end
     
-    % calculate the postsynaptic potential
-    if (V(t-1) == SpikeAmp)
-        % if the previous time step was a spike, set v to 0 this time step
-        % this does not get used
-        v = 0;
-    else
-        % v evolves according to a classic different equation with two inputs:
-        % 1.) presynaptic current (R * U)
-        % 2.) input current (not really used here)
-        v = v - v / tau + presyni(t) + Iin(t);
-        if v > 1
-            v = SpikeAmp;
-        end
-    end
+    % record values
+    util(t) = u;
+    resources(t) = r;
+    produc(t) = curr;
+    
+    v = v - v / tau + curr + Iin(t);
     V(t) = v;
     
+%     fprintf('t=%3d, IPI=%3d, u=%.2f, R=%.2f, lastspk=%d, V=%.2f\n', ...
+%              t, ipi, uP, rP, lastspike, v);
     fprintf('t=%3d, IPI=%3d, u=%.2f, R=%.2f, lastspk=%d, V=%.2f\n', ...
-             t, ipi, uP, rP, lastspike, v);
+             t, ipi, u, r, lastspike, v);
 end
 if do_plot
     cla
+%     plot(produc, 'c', 'linewidth', 3)
     plot(produc, 'c')
+%     plot(presyni, 'c')
     plot(util, 'g')
     plot(resources, 'r')
-    plot(V, 'k', 'linewidth', [3])
+%     plot(V, 'k', 'linewidth', 3)
+    plot(V, 'k')
     xlabel('Time (ms)');
 end
