@@ -1,15 +1,15 @@
-function [V, RELEASE] = IAF_STP(t, spiketimes, u, tfac, tdep, in)
-
-% [V R]=IAF_STP(1:500,[100 200],U,tfac,trec,(1:500)*0);
+function IAF_STP(t, spiketimes, u, tfac, trec, in)
 % Self-Contained function to Study the Markram/Tsodyks Model
 
 % t: time vector in ms
 % spiketimes: spike times in ms
-% u: Utilization constant (how much is released)
+% u: util constant (how much is released)
 % tfac: time constant of facilitation
-% tdep: time constant of depression
+% trec: time constant of depression
 % in = injected current (vector size t)
+
 % EXAMPLE:
+
 % Iin=zeros(1,2000); Iin(1000:1100)=0.06;
 % [V p]=IAF_STP(1:2000,100:100:1000,0.15,270,6,Iin);
 % u is essentially used for faciliation
@@ -17,67 +17,99 @@ function [V, RELEASE] = IAF_STP(t, spiketimes, u, tfac, tdep, in)
 % dR/dt = (1-R)/trec ?
 % u, I think is bounded between U and 1 (small values of U will help facilitation)
 
+% U=0.75; tfac=100; trec = 5;
+
 %%% CONSTANTS %%%
-tau = 5; % membrane time constant
-SpikeAmp = 4;
-Iin = zeros(1, length(t)) + in;
-%U=0.75; tfac=100; trec = 5;
+do_plot = true;
+tau = 5;                            % membrane time constant
+SpikeAmp = 2;                       % spike amplitude
+Iin = zeros(1, length(t)) + in; 
 
 %%% VARIABLES %%%
-r = 1;
-% uP = u; RP = 1; % potential values
-lastspike = -9e10;
-v = 0;
+r = 1;                              % ?
+lastspike = -9e10;                  % initial spike time (forever ago)
+v = 0;                              % initial voltage, 0 so it can be plotted alongside other vars
 
-RELEASE(1, 2) = r * u;
-RELEASE(1, 3) = u;
-RELEASE(1, 4) = r;
+% initialize time vectors
+[V, presyni, util, resources, produc] = deal(zeros(1, length(t)));
 
-V = zeros(1, length(t));
+% set initial values of time vectors
+resources(1) = r;                   % synaptic resources
+util(1) = u;                        % utilization level (release probability)
+produc(1) = r * u;                  % product of the two above
+% rP = r;
+
 for t = 2:length(t)
     
-    spike = find(t == spiketimes);
-    if (~isempty(spike))
-        SPIKE = 1;
+    % check if spiking
+    spike = find(spiketimes == t);
+    if ~isempty(spike)
+        SPIKE = true;
     else
-        SPIKE = 0;
-    end;
-    ipi = t - lastspike; % inter-peak interval
-    RELEASE(t, 1) = 0;
-    
-    %%% POTENTIAL STENGTH AT ALL TIMES
-    RP = r * (1 - u) * exp(-ipi/tdep) + 1 - exp(-ipi/tdep);
-    uP = u * (exp(-ipi/tfac)) + u * (1 - u * exp(-ipi/tfac));
-    RELEASE(t, 2) = RP * uP;
-    RELEASE(t, 3) = uP; % "FACILITATION"
-    RELEASE(t, 4) = RP; % "DEPRESSION"
-    
-    %%% ACTUAL STRENGTH AT SPIKES
-    if SPIKE == 1
-        r = r * (1 - u) * exp(-ipi/tdep) + 1 - exp(-ipi/tdep);
-        u = u * (exp(-ipi/tfac)) + u * (1 - u * exp(-ipi/tfac));
-        RELEASE(t, 1) = r * u;
+        SPIKE = false;
     end
     
-    %fprintf('t=%5d IPI=%5d  u=%5.2f   R=%5.2f lastspike=%5.2f\n',t,ipi,u,R,lastspike);
-    if (~isempty(spike))
+    % time since last spike
+    ipi = t - lastspike; % inter-pulse interval
+    
+    % calculate change in R and U
+    % for more complete description, see below
+    uP = u + u * (1 - u) * exp(-ipi/tfac);
+    rP = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+    urP = uP * rP;
+    
+    % record values
+    util(t) = uP;
+    resources(t) = rP;
+    produc(t) = urP;
+    
+    % if spiking, actually change the R and U vals
+    % NOTE: this means that r and u only change after spikes
+    if SPIKE
+        
+        % change in utilization following spike
+        % eqn 2.3 from Tsodyks et al. (1998)
+        u = u + u * (1 - u) * exp(-ipi/tfac);
+              
+        % change in resources following spike
+        % solved version of differential equation in (1) of
+        % http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
+        r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+        
+        % the presynaptic current will be their product
+        presyni(t) = r * u;
+        
+        % update lastspike to be the new spike time
         lastspike = spiketimes(spike);
+        
+    else
+        presyni(t) = 0;
     end
     
+    % calculate the postsynaptic potential
     if (V(t-1) == SpikeAmp)
-        V(t) = 0;
+        % if the previous time step was a spike, set v to 0 this time step
+        % this does not get used
+        v = 0;
     else
-%         t
-        V(t) = v - v / tau + RELEASE(t, 1) + Iin(t);
-        if (V(t) > 1), V(t) = SpikeAmp; end;
+        % v evolves according to a classic different equation with two inputs:
+        % 1.) presynaptic current (R * U)
+        % 2.) input current (not really used here)
+        v = v - v / tau + presyni(t) + Iin(t);
+        if v > 1
+            v = SpikeAmp;
+        end
     end
-    v = V(t);
+    V(t) = v;
+    
+    fprintf('t=%3d, IPI=%3d, u=%.2f, R=%.2f, lastspk=%d, V=%.2f\n', ...
+             t, ipi, uP, rP, lastspike, v);
 end
-if (1)
+if do_plot
     cla
-    %plot(RELEASE(:,1),'linewidth',[2])
-    plot(RELEASE(:, 2), 'c')
-    plot(RELEASE(:, 3), 'g')
-    plot(RELEASE(:, 4), 'r')
+    plot(produc, 'c')
+    plot(util, 'g')
+    plot(resources, 'r')
     plot(V, 'k', 'linewidth', [3])
+    xlabel('Time (ms)');
 end
