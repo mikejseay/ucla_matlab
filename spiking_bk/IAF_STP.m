@@ -22,14 +22,14 @@ Iin      = zeros(1,length(t))+in;
 
 
 %%% VARIABLES %%%
-u=0; R=1; 
+u=0; r=1; 
 uP = 0; RP =1; % potential values
 lastspike = -9e10;
 v=0;
 
 RELEASE(1,2)=0;
 RELEASE(1,3)=0;
-RELEASE(1,4)=R;
+RELEASE(1,4)=r;
 
 V = zeros(1,length(t));
 for t=2:length(t)
@@ -44,20 +44,27 @@ for t=2:length(t)
    RELEASE(t,1) = 0;
 
    %%% POTENTIAL STENGTH AT ALL TIMES
-   RP = R*(1 - u)*exp(-ipi/trec) + 1 - exp(-ipi/trec);		 
-   uP = u*(exp(-ipi/tfac)) + U*(1-u*exp(-ipi/tfac)); 
+   RP = r*(1 - u)*exp(-ipi/trec) + 1 - exp(-ipi/trec);		 
+%    uP = u*(exp(-ipi/tfac)) + U*(1-u*exp(-ipi/tfac)); 
+   uP = U + (1 - U) * u * exp(-ipi/tfac);
    RELEASE(t,2) = RP*uP;
    RELEASE(t,3) = uP; % "FACILITATION"
    RELEASE(t,4) = RP; % "DEPRESSION"
 
    %%% ACTUAL STRENGTH AT SPIKES
+   % this demonstrates that we need only calculate the change in u at the
+   % time of the spike, and the simulation will still be accurate. that is,
+   % the passive decay and change can be calculated independently, as they
+   % simply sum here
    if SPIKE==1
-      R = R*(1 - u)*exp(-ipi/trec) + 1 - exp(-ipi/trec);	
-      u = u*(exp(-ipi/tfac)) + U*(1-u*exp(-ipi/tfac)); 
-%       u = u + U * (1 - u) * exp(-ipi/tfac);
-      RELEASE(t,1) = R*u;
+%       r = r*(1 - u)*exp(-ipi/trec) + 1 - exp(-ipi/trec);	
+%       u = u*(exp(-ipi/tfac)) + U*(1-u*exp(-ipi/tfac)); 
+      u = U + (1 - U) * u * exp(-ipi/tfac);
+      r = r*(1 - u)*exp(-ipi/trec) + 1 - exp(-ipi/trec);	
+
+      RELEASE(t,1) = r*u;
       uP=u;
-      RP=R;
+      RP=r;
    end
    
    %fprintf('t=%5d IPI=%5d  u=%5.2f   R=%5.2f lastspike=%5.2f\n',t,ipi,u,R,lastspike);
@@ -65,7 +72,7 @@ for t=2:length(t)
    if (V(t-1)==SpikeAmp)
       V(t)=0;
    else
-      t
+%       t
       V(t)=v-v/tau+RELEASE(t,1) + Iin(t);
       if (V(t)>1), V(t)=SpikeAmp; end;
    end

@@ -6,7 +6,7 @@ u_init = 0.25;
 tFac_init = 100;
 tRec_init = 20;
 
-firing_type = 'poisson'; % set, regular, poisson
+firing_type = 'set'; % set, regular, poisson
 
 % how to set initial spike times
 switch firing_type
@@ -24,7 +24,7 @@ switch firing_type
         
     case 'poisson'
         % Poisson spikes
-        fr = 10;
+        fr = 8;
         t_end = 1000;
         fs = 1000;
         t = 1:t_end;
@@ -45,7 +45,7 @@ SP1 = subplot(2, 1, 1);
 set(SP1, 'position', [0.1, 0.1, 0.8, 0.6])
 hold on
 
-callback_str = ['IAF_STP(1:max(str2num(get(P4, ''string'')))+100,', ...
+callback_str = ['IAF_STP_ms(1:max(str2num(get(P4, ''string'')))+100,', ...
     'str2num(get(P4, ''string'')), str2num(get(P1, ''string'')),', ...
     'str2num(get(P2, ''string'')), str2num(get(P3, ''string'')), 0);'];
 % IAF_STP(1:max(str2num(get(P4, 'string')))+100, str2num(get(P4, 'string')), str2num(get(P1, 'string')), str2num(get(P2, 'string')), str2num(get(P3, 'string')), 0);

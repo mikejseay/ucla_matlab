@@ -1,9 +1,8 @@
-function IAF_STP(t, spiketimes, u_init, tfac, trec, in)
+function IAF_STP_analytical_ms(t, spiketimes, U, tfac, trec, in)
 % Self-Contained function to Study the Markram/Tsodyks Model
 
 % t: time vector in ms
 % spiketimes: spike times in ms
-% u_init: initial utilization
 % U: maximum utilization increase
 % tfac: time constant of facilitation
 % trec: time constant of depression
@@ -24,8 +23,6 @@ function IAF_STP(t, spiketimes, u_init, tfac, trec, in)
 do_plot = true;
 tau = 5;                            % membrane time constant
 SpikeAmp = 2;                       % spike amplitude
-U = u_init;                         % maximum utilization increase
-% U = 0.1;
 Iin = zeros(1, length(t)) + in; 
 
 %%% VARIABLES %%%
@@ -43,6 +40,9 @@ curr = 0;
 % u = U;
 util(1) = u;                        % utilization level (release probability)
 produc(1) = r * u;                  % product of the two above
+
+% initialize the "potential value" variables
+uP = u;
 rP = r;
 
 for t = 2:length(t)
@@ -70,15 +70,14 @@ for t = 2:length(t)
 %     resources(t) = rP;
 %     produc(t) = urP;
     
-    % if spiking, actually change the R and U vals
-    % NOTE: this means that r and u only change after spikes
+    % if spiking, increment u and decrement r
     if SPIKE
         
         % change in utilization following spike
         % eqn 2.3 from Tsodyks et al. (1998)
-%         u = u + U * (1 - u) * exp(-ipi/tfac);
-        u = u - u / tfac + U * (1 - u);
-        
+        u = U + (1 - U) * u * exp(-ipi / tfac);
+%         u = u - u / tfac + U * (1 - u);
+
         % the presynaptic maximal current will be their product
 %         presyni(t) = r * u;
         curr = curr - curr / tau + u * r;
@@ -86,8 +85,8 @@ for t = 2:length(t)
         % change in resources following spike
         % solved version of second differential equation in (1) of
         % http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
-%         r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
-        r = r + (1 - r) / trec - u * r;
+        r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+%         r = r + (1 - r) / trec - u * r;
         
         
         % the presynaptic maximal current will be their product
@@ -96,17 +95,33 @@ for t = 2:length(t)
         % update lastspike to be the new spike time
         lastspike = spiketimes(spike);
         
+        % record values
+        util(t) = u;
+        resources(t) = r;
+        produc(t) = curr;
+        
+        % assign current values of u and r to new variables so that their potential
+        % values can be calculated
+        uP = u;
+        rP = r;
+    
+    % if not spiking, u and r simply decay in an exponential fashion
     else
-        u = u - u / tfac;
-        curr = curr - curr / tau;
-        r = r + (1 - r) / trec;
+%         u = u - u / tfac;
+        uP = U + (1 - U) * u * exp(-ipi / tfac);
+        curr = curr - curr / tau;  % notice that u and r do not influence this
+        rP = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+        
+%         r = r + (1 - r) / trec;
         presyni(t) = 0;
+        
+        % record values
+        util(t) = uP;
+        resources(t) = rP;
+        produc(t) = curr;
+    
     end
     
-    % record values
-    util(t) = u;
-    resources(t) = r;
-    produc(t) = curr;
     
     v = v - v / tau + curr + Iin(t);
     V(t) = v;

@@ -3,7 +3,7 @@
 close all
 figure
 set(gcf,'units','normal','position',[0.005 0.04 0.9 0.8])
-SP1 = subplot(2,1,1)
+SP1 = subplot(2,1,1);
 set(SP1,'position',[0.1 0.1 0.8 0.6])
 hold on
 %%% INTERACTIVE GRAPHICS
