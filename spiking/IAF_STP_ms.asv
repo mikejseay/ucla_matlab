@@ -82,13 +82,12 @@ for t = 2:length(t)
         % at a spike, u is incremented by a proportion U (uppercase, constant)
         % of the remaining "utilization space." this also prevents u from
         % ever going above 1
-        % u decays to 0 with a time constant tfac... when tfac is small, u will
+        % u decays with a time constant tfac... when tfac is small, u will
         % decay back to 0 very quickly (reflecting perhaps, faster Ca2+
         % clearance in the cell) whereas when tfac is large, u will be able
         % to "build up" Ca2+ given that the spike intervals are small
         % relative to tfac.
         u = u - u / tfac + U * (1 - u);
-        % key: u is incremented by spike-unaffected u
         
         % the presynaptic maximal current will be their product
 %         presyni(t) = r * u;
@@ -98,23 +97,12 @@ for t = 2:length(t)
         % post-change utilization times the pre-change resources.
         % thus, at the first spike it can be at most 1 if U were 1
         curr = curr - curr / tau + u * r;
-        % key: current is incremented by spike-affected u and
-        % spike-unaffected r
         
         % change in resources following spike
         % solved version of second differential equation in (1) of
         % http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
-        % initialized at 1. can be thought of as the amount of
-        % neurotransmitter available.
-        % at a spike, r is decremented by the current multiplier value from
-        % above.
-        % r accumulates to 1 with a time constant trec... when trec is
-        % large, r will take longer to replenish and thus become
-        % "exhausted." when trec is small, r will replenish very quickly.
 %         r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
         r = r + (1 - r) / trec - u * r;
-        % key: resources are decremented by spike-affected u and
-        % spike-unaffected r
         
         
         % the presynaptic maximal current will be their product

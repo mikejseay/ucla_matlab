@@ -59,8 +59,9 @@ for t=2:length(t)
    if SPIKE==1
 %       r = r*(1 - u)*exp(-ipi/trec) + 1 - exp(-ipi/trec);	
 %       u = u*(exp(-ipi/tfac)) + U*(1-u*exp(-ipi/tfac)); 
-      u = U + (1 - U) * u * exp(-ipi/tfac);
+%       u = U + (1 - U) * u * exp(-ipi/tfac);
       r = r*(1 - u)*exp(-ipi/trec) + 1 - exp(-ipi/trec);	
+      u = U + (1 - U) * u * exp(-ipi/tfac);
 
       RELEASE(t,1) = r*u;
       uP=u;
