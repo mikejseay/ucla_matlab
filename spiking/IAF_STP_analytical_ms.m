@@ -73,12 +73,14 @@ for t = 2:length(t)
     % if spiking, increment u and decrement r
     if SPIKE
         
-        r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+%         r = 1 + exp(-ipi/trec) * (r * (1 - u) - 1);
         
         % change in utilization following spike
         % eqn 2.3 from Tsodyks et al. (1998)
-        u = U + (1 - U) * u * exp(-ipi / tfac);
+        u = U + exp(-ipi / tfac) * (1 - U) * u;
 %         u = u - u / tfac + U * (1 - u);  % corresponding difference equation
+
+        r = 1 + exp(-ipi/trec) * (r * (1 - u) - 1);
 
         % the presynaptic maximal current will be their product
 %         presyni(t) = r * u;
@@ -87,7 +89,7 @@ for t = 2:length(t)
         % change in resources following spike
         % solved version of second differential equation in (1) of
         % http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
-%         r = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
+%         r = 1 + exp(-ipi/trec) * (r * (1 - u) - 1);
 %         r = r + (1 - r) / trec - u * r;  % corresponding difference equation
         
         

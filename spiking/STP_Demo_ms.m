@@ -2,11 +2,11 @@
 % USES IAF_STP.m
 
 % init vals
-u_init = 0.25;
-tFac_init = 21;
-tRec_init = 706;
+u_init = 0.2;
+tFac_init = 400;
+tRec_init = 20;
 
-firing_type = 'regular'; % set, regular, poisson
+firing_type = 'set'; % set, regular, poisson
 
 % how to set initial spike times
 switch firing_type
