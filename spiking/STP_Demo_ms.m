@@ -3,10 +3,10 @@
 
 % init vals
 u_init = 0.25;
-tFac_init = 100;
-tRec_init = 20;
+tFac_init = 21;
+tRec_init = 706;
 
-firing_type = 'set'; % set, regular, poisson
+firing_type = 'regular'; % set, regular, poisson
 
 % how to set initial spike times
 switch firing_type
@@ -16,7 +16,7 @@ switch firing_type
         
     case 'regular'
         % regular firing
-        fr = 10;
+        fr = 50;
         init_spiketime = 100;
         fs = 1000;
         t_end = 1000;
