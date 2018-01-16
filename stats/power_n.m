@@ -1,11 +1,11 @@
 % set null and alternate population means, population standard deviation
-mu_0 = 25;
-mu_a = 30;
-sigma = 8;
+mu_0 = 32;
+mu_a = 45;
+sigma = 20;
 
-% set desired alpha and power
-alpha = 0.05;
-power = 0.9;
+% set desired alpha and n
+alpha = 0.01;
+power = 0.95;
 
 % compute z-score for desired power and alpha
 z_power = norminv(1 - power);

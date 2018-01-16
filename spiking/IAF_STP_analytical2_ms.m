@@ -1,4 +1,4 @@
-function IAF_STP_analytical_ms(t, spiketimes, U, tfac, trec, in)
+function IAF_STP_analytical2_ms(t, spiketimes, trec, tfac, U, f, in)
 % Self-Contained function to Study the Markram/Tsodyks Model
 
 % t: time vector in ms
@@ -73,11 +73,11 @@ for t = 2:length(t)
     % if spiking, increment u and decrement r
     if SPIKE
         
-        r = 1 + exp(-ipi/trec) * (r * (1 - u) - 1);
+        r = 1 - (1 - r * (1 - u)) * exp(-ipi/trec);
         
         % change in utilization following spike
         % eqn 2.3 from Tsodyks et al. (1998)
-        u = U + exp(-ipi / tfac) * (1 - U) * u;
+        u = U + (u + f * (1 - u) - U) * exp(-ipi / tfac);
 %         u = u - u / tfac + U * (1 - u);  % corresponding difference equation
 
 %         r = 1 + exp(-ipi/trec) * (r * (1 - u) - 1);
@@ -112,9 +112,9 @@ for t = 2:length(t)
     % if not spiking, u and r simply decay in an exponential fashion
     else
 %         u = u - u / tfac;
-        uP = U + (1 - U) * u * exp(-ipi / tfac);
+        rP = 1 - (1 - r * (1 - u)) * exp(-ipi/trec);
+        uP = U + (u + f * (1 - u) - U) * exp(-ipi / tfac);
         curr = curr - curr / tau;  % notice that u and r do not influence this
-        rP = 1 + (r * (1 - u) - 1) * exp(-ipi/trec);
         
 %         r = r + (1 - r) / trec;
         presyni(t) = 0;
