@@ -51,11 +51,13 @@ function spikeTimes = stp_gui_SetSpikeTimes(type)
 
         case 'regular'
             % regular firing
-            fr = 50;
+            fr = 40;
             init_spiketime = 100;
             fs = 1000;
-            t_end = 1000;
-            spikeTimes = init_spiketime:(fs/fr):t_end;
+            n_spikes = 8;
+            spikeTimes = round(linspace(init_spiketime, ...
+                    init_spiketime + (n_spikes - 1) * fs / fr, ...
+                    n_spikes)); 
 
         case 'poisson'
             % Poisson spikes
@@ -98,6 +100,41 @@ function [tRec, tFac, U, f] = stp_gui_SetSTPRegime(regime)
             tRec = 20;
             tFac = 1700;
             U = 0.1;
+            f = 0.11;
+        case 'PC-PC'
+            tRec = 350;
+            tFac = 350;
+            U = 0.4;
+            f = 0.11;
+        case 'PC-BC'
+            tRec = 200;
+            tFac = 25;
+            U = 0.45;
+            f = 0.11;
+        case 'PC-MC'
+            tRec = 25;
+            tFac = 400;
+            U = 0.05;
+            f = 0.11;
+        case 'BC-PC'
+            tRec = 100;
+            tFac = 10;
+            U = 0.2;
+            f = 0.2;
+        case 'MC-PC'
+            tRec = 10;
+            tFac = 100;
+            U = 0.15;
+            f = 0.11;
+        case 'TC-BC'
+            tRec = 250;
+            tFac = 25;
+            U = 0.4;
+            f = 0.11;
+        case 'TC-PC'
+            tRec = 200;
+            tFac = 50;
+            U = 0.2;
             f = 0.11;
     end
 

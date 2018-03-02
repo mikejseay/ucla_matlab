@@ -104,17 +104,37 @@ function [tRec, tFac, U, f] = stp_gui_SetSTPRegime(regime)
             U = 0.4;
             f = 0.11;
         case 'PC-BC'
-            tRec = 600;
-            tFac = 400;
-            U = 0.7;
+            tRec = 200;
+            tFac = 25;
+            U = 0.45;
             f = 0.11;
         case 'PC-MC'
-            tRec = 100;
-            tFac = 1200;
+            tRec = 25;
+            tFac = 400;
             U = 0.05;
             f = 0.11;
+        case 'BC-PC'
+            tRec = 100;
+            tFac = 10;
+            U = 0.2;
+            f = 0.2;
+        case 'MC-PC'
+            tRec = 10;
+            tFac = 100;
+            U = 0.15;
+            f = 0.11;
+        case 'TC-BC'
+            tRec = 250;
+            tFac = 25;
+            U = 0.4;
+            f = 0.11;
+        case 'TC-PC'
+            tRec = 200;
+            tFac = 50;
+            U = 0.2;
+            f = 0.11;
     end
-
+    
 % --- Executes just before stp_gui_intervals is made visible.
 function stp_gui_intervals_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.

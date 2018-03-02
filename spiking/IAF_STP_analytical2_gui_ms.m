@@ -1,5 +1,6 @@
 function IAF_STP_analytical2_gui_ms(t, spiketimes, trec, tfac, U, f, in)
-% Self-Contained function to Study the Markram/Tsodyks Model
+% Self-Contained function to Study the extended (four-parameter)
+% Tsodyks-Markram Model of Short-Term Plasticity (STP)
 
 % t: time vector in ms
 % spiketimes: spike times in ms

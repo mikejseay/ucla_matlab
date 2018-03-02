@@ -21,7 +21,7 @@ function IAF_STP_analytical2_ms(t, spiketimes, trec, tfac, U, f, in)
 
 %%% CONSTANTS %%%
 do_plot = true;
-tau = 5;                            % membrane time constant
+tau = 18;                            % membrane time constant
 SpikeAmp = 2;                       % spike amplitude
 Iin = zeros(1, length(t)) + in; 
 
