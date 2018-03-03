@@ -1,4 +1,4 @@
-function IAF_STP_analytical2_gui_interval_ms(t, spiketimes, trec, tfac, U, f, in)
+function V = IAF_STP_analytical2_gui_interval_ms(t, spiketimes, trec, tfac, U, f, in)
 % Self-Contained function to Study the Markram/Tsodyks Model
 
 % t: time vector in ms
@@ -132,8 +132,8 @@ for t = 2:length(t)
     
 %     fprintf('t=%3d, IPI=%3d, u=%.2f, R=%.2f, lastspk=%d, V=%.2f\n', ...
 %              t, ipi, uP, rP, lastspike, v);
-    fprintf('t=%3d, IPI=%3d, u=%.2f, R=%.2f, lastspk=%d, V=%.2f\n', ...
-             t, ipi, u, r, lastspike, v);
+%     fprintf('t=%3d, IPI=%3d, u=%.2f, R=%.2f, lastspk=%d, V=%.2f\n', ...
+%              t, ipi, u, r, lastspike, v);
 end
 if do_plot
     V(circshift(V < .0001, -1)) = NaN;

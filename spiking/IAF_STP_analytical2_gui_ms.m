@@ -148,4 +148,5 @@ if do_plot
     plot(V, 'k')
     hold off;
     xlabel('Time (ms)');
+    ylim([0 1]);
 end

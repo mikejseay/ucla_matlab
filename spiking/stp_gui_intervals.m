@@ -47,7 +47,7 @@ function spikeTimes = stp_gui_SetSpikeTimes(type)
     switch type
         case 'set times'
             % set times
-            spikeTimes = [50 100 250];
+            spikeTimes = [50 100 200];
 
         case 'regular'
             % regular firing
