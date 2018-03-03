@@ -69,8 +69,8 @@ all_psp22 = reshape(all_psp2, ppr_intended_dims);
 % display experiments across taus for a fixed U and f
 
 % set U and f
-Ui_use = 1;
-fi_use = 6;
+Ui_use = 3;
+fi_use = 4;
 
 ymin = nanmin(all_V2(:));
 ymax = nanmax(all_V2(:));
@@ -150,8 +150,7 @@ end
 ppr_intcvs = squeeze(std(all_ppr2, 0, 1) ./ mean(all_ppr2, 1));
 firstint_epsps = squeeze(all_psp22(1, :, :, :, :));
 
-% comb_mat = ppr_intcvs .* (1 / firstint_epsps);
-comb_mat = ppr_intcvs;
+comb_mat = ppr_intcvs .* (1 / firstint_epsps);
 
 cmin = min(comb_mat(:));
 cmax = max(comb_mat(:));
@@ -205,29 +204,7 @@ for Ui=1:n_U
 end
 
 
-%% adjacent interval PSP size ratios
+%%
 
 adjint_ratios = all_psp22(1:4, :, :, :, :) ./ all_psp22(2:5, :, :, :, :);
-xadjint_cvs = squeeze(std(adjint_ratios, 0, 1) ./ mean(adjint_ratios, 1));
-xadjint_means = squeeze(mean(adjint_ratios, 1));
-xadjint_mask = squeeze(all(adjint_ratios > 1, 1));
 
-xadjint_means(~xadjint_mask) = NaN;
-
-cmin = min(xadjint_means(:));
-cmax = max(xadjint_means(:));
-clims = [cmin cmax];
-figure(23); clf;
-d = 0;
-for Ui=1:n_U
-    for fi=1:n_f
-        d = d + 1;
-        ax = subplot(n_U, n_f, d);
-        pd = squeeze(xadjint_means(:, :, Ui, fi));
-        imagesc_cb(pd, ax, 'Reds', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
-        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
-        title(supi);
-    end
-end
