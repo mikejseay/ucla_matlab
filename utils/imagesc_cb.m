@@ -27,7 +27,7 @@ end
 
 % build figure
 i = imagesc(ax, C);
-set(gca, 'YDir', 'normal');
+% set(gca, 'YDir', 'normal');
 colormap(ax, cmap);
 
 if plot_cbar

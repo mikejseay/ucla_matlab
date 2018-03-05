@@ -4,17 +4,26 @@
 % first define params
 
 intervals = [25 50 100 200 400];
-t = 1:max(intervals)+100;
+t = 1:max(intervals)+50;
 in = 0;
 lbls = cell(length(intervals), 1);
 
 tf_vals = [1 25*2.^(1:5)];
 td_vals = [1 25*2.^(1:5)];
-U_vals = .1:.05:.3;
-f_vals = .05:.05:.3;
-int_vals = [50 100 200];
+U_vals = .1:.1:.3;
+f_vals = .1:.1:.3;
 
-spk_range = [10 40];
+spk_range = [10 20];
+
+n_tf = length(tf_vals);
+n_td = length(td_vals);
+n_U = length(U_vals);
+n_f = length(f_vals);
+n_intervals = length(intervals);
+n_timepts = length(t);
+
+V_intended_dims = [n_timepts n_intervals n_tf n_td n_U n_f];
+ppr_intended_dims = [n_intervals n_tf n_td n_U n_f];
 
 %% calculate all results
 
@@ -23,18 +32,12 @@ tf_ur = a(:);
 td_ur = b(:);
 U_ur = c(:);
 f_ur = d(:);
-
-n_tf = length(tf_vals);
-n_td = length(td_vals);
-n_U = length(U_vals);
-n_f = length(f_vals);
-n_intervals = length(intervals);
-n_timepts = length(t);
 n_iter = length(f_ur);
 
 all_V = zeros(n_timepts, n_intervals, n_iter);
-all_psp2 = zeros(n_intervals, n_iter);
-all_ppr = zeros(n_intervals, n_iter);
+all_psp1_long = zeros(n_intervals, n_iter);
+all_psp2_long = zeros(n_intervals, n_iter);
+all_ppr_long = zeros(n_intervals, n_iter);
 
 for i=1:n_iter
     
@@ -51,26 +54,26 @@ for i=1:n_iter
         psp2 = max(vi(spk_range(1):spk_range(2) + intervals(inti)));
         ppr = psp2 / psp1;
         all_V(:, inti, i) = vi;
-        all_ppr(inti, i) = ppr;
-        all_psp2(inti, i) = psp2;
+        all_ppr_long(inti, i) = ppr;
+        all_psp1_long(inti, i) = psp1;
+        all_psp2_long(inti, i) = psp2;
     end
     
 end
 
 %% reshape results
 
-V_intended_dims = [n_timepts n_intervals n_tf n_td n_U n_f];
-ppr_intended_dims = [n_intervals n_tf n_td n_U n_f];
 all_V2 = reshape(all_V, V_intended_dims);
-all_ppr2 = reshape(all_ppr, ppr_intended_dims);
-all_psp22 = reshape(all_psp2, ppr_intended_dims);
+all_ppr = reshape(all_ppr_long, ppr_intended_dims);
+all_psp1 = reshape(all_psp1_long, ppr_intended_dims);
+all_psp2 = reshape(all_psp2_long, ppr_intended_dims);
 
 %% plot results (1)
 % display experiments across taus for a fixed U and f
 
 % set U and f
 Ui_use = 1;
-fi_use = 6;
+fi_use = 3;
 
 ymin = nanmin(all_V2(:));
 ymax = nanmax(all_V2(:));
@@ -98,11 +101,51 @@ end
 supi = ['U=', num2str(U_vals(Ui_use)), ' f=', num2str(f_vals(fi_use))];
 suptitle(supi);
 
+
+%% plot results (1.1)
+% display experiments across taus for all U/f
+
+% set U and f
+ymin = nanmin(all_V2(:));
+ymax = nanmax(all_V2(:));
+
+for Ui=1:n_U
+    for fi=1:n_f
+figure;
+d = 0;
+for tfi=1:n_tf
+    for tdi=1:n_td
+        
+        d = d + 1;
+        subplot(n_tf, n_td, d);
+        hold on;
+        for inti=1:n_intervals
+            vi = all_V2(:, inti, tfi, tdi, Ui, fi);
+            plot(vi);
+            ylim([ymin ymax]);
+        end
+        set(gca,'Yticklabel',[]) 
+        set(gca,'Xticklabel',[])
+        supi = ['tf=', num2str(tf_vals(tfi)), ' td=', num2str(td_vals(tdi))];
+        title(supi);
+    end
+end
+supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+suptitle(supi);
+    end
+end
+
+%% plot results (1.2)
+% display psp1 amps
+
+%% plot results (1.3)
+
+
 %% plot results (2)
 % show PPRs by intervals (figure), U/f (subplot), and taus (x/y axes of
 % image plot)
 
-cmax = max(all_ppr2(:));
+cmax = max(all_ppr(:));
 clims = [1 cmax];
 for inti=1:n_intervals
     figure(inti); clf;
@@ -111,7 +154,7 @@ for inti=1:n_intervals
         for fi=1:n_f
             d = d + 1;
             ax = subplot(n_U, n_f, d);
-            pd = squeeze(all_ppr2(inti, :, :, Ui, fi));
+            pd = squeeze(all_ppr(inti, :, :, Ui, fi));
             imagesc_cb(pd, ax, 'Reds', clims);
             set(gca,'Yticklabel',[]) 
             set(gca,'Xticklabel',[])
@@ -124,7 +167,7 @@ end
 
 %% which parameters provide the most dynamic range in PPR across intervals?
 
-ppr_intcvs = squeeze(std(all_ppr2, 0, 1) ./ mean(all_ppr2, 1));
+ppr_intcvs = squeeze(std(all_ppr, 0, 1) ./ mean(all_ppr, 1));
 
 cmin = min(ppr_intcvs(:));
 cmax = max(ppr_intcvs(:));
@@ -147,8 +190,7 @@ end
 %% which parameters provide good dynamic range of PPRs *and* a relatively small
 % EPSP for the first interval? this optimizes the excitatory neuron
 
-ppr_intcvs = squeeze(std(all_ppr2, 0, 1) ./ mean(all_ppr2, 1));
-firstint_epsps = squeeze(all_psp22(1, :, :, :, :));
+ppr_intcvs = squeeze(std(all_ppr, 0, 1) ./ mean(all_ppr, 1));
 
 % comb_mat = ppr_intcvs .* (1 / firstint_epsps);
 comb_mat = ppr_intcvs;
@@ -178,8 +220,8 @@ end
 % and second interval *and* a large EPSP for the first interval
 % this optimizes the inhibitory neuron
 
-epsp_diffs = squeeze(all_psp22(1, :, :, :, :) - all_psp22(2, :, :, :, :));
-firstint_epsps = squeeze(all_psp22(1, :, :, :, :));
+epsp_diffs = squeeze(all_psp2(1, :, :, :, :) - all_psp2(2, :, :, :, :));
+firstint_epsps = squeeze(all_psp2(1, :, :, :, :));
 
 comb_mat2 = epsp_diffs .* firstint_epsps;
 
@@ -207,7 +249,7 @@ end
 
 %% adjacent interval PSP size ratios
 
-adjint_ratios = all_psp22(1:4, :, :, :, :) ./ all_psp22(2:5, :, :, :, :);
+adjint_ratios = all_psp2(1:4, :, :, :, :) ./ all_psp2(2:5, :, :, :, :);
 xadjint_cvs = squeeze(std(adjint_ratios, 0, 1) ./ mean(adjint_ratios, 1));
 xadjint_means = squeeze(mean(adjint_ratios, 1));
 xadjint_mask = squeeze(all(adjint_ratios > 1, 1));
@@ -224,6 +266,114 @@ for Ui=1:n_U
         d = d + 1;
         ax = subplot(n_U, n_f, d);
         pd = squeeze(xadjint_means(:, :, Ui, fi));
+        imagesc_cb(pd, ax, 'Reds', clims);
+        set(gca,'Yticklabel',[]) 
+        set(gca,'Xticklabel',[])
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+
+%% lower vs. upper interval PPR variance
+
+ppr_intcvs_exc = squeeze(std(all_ppr(2:5, :, :, :, :), 0, 1) ./ mean(all_ppr(2:5, :, :, :, :), 1));
+ppr_intcvs_inh = squeeze(std(all_ppr(1:4, :, :, :, :), 0, 1) ./ mean(all_ppr(1:4, :, :, :, :), 1));
+
+% optim_mat = ppr_intcvs_exc .* ppr_intcvs_inh;
+
+cmin = min(ppr_intcvs_exc(:));
+cmax = max(ppr_intcvs_exc(:));
+clims = [cmin cmax];
+figure(24); clf;
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(ppr_intcvs_exc(:, :, Ui, fi));
+        imagesc_cb(pd, ax, 'Greens', clims);
+        set(gca,'Yticklabel',[]) 
+        set(gca,'Xticklabel',[])
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+
+cmin = min(ppr_intcvs_inh(:));
+cmax = max(ppr_intcvs_inh(:));
+clims = [cmin cmax];
+figure(25); clf;
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(ppr_intcvs_inh(:, :, Ui, fi));
+        imagesc_cb(pd, ax, 'Reds', clims);
+        set(gca,'Yticklabel',[]) 
+        set(gca,'Xticklabel',[])
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+
+%% diffs
+
+ppr_diffs = diff(all_ppr, 1, 1);
+
+ppr_intdiffcvs_exc = squeeze(std(ppr_diffs(2:4, :, :, :, :), 0, 1) ./ mean(ppr_diffs(2:4, :, :, :, :), 1));
+ppr_intdiffcvs_inh = squeeze(std(ppr_diffs(1:3, :, :, :, :), 0, 1) ./ mean(ppr_diffs(1:3, :, :, :, :), 1));
+
+
+%% linear fit
+
+x = 1:4;
+for tfi=1:n_tf
+    for tdi=1:n_td
+        for Ui=1:n_U
+            for fi=1:n_f
+                y = all_ppr(2:5, tfi, tdi, Ui, fi);
+                
+            end
+        end
+    end
+end
+
+[b, bint, r, rint, stats] = regress(y, X);
+
+ppr_intcvs_exc = squeeze(std(all_ppr(2:5, :, :, :, :), 0, 1) ./ mean(all_ppr(2:5, :, :, :, :), 1));
+ppr_intcvs_inh = squeeze(std(all_ppr(1:4, :, :, :, :), 0, 1) ./ mean(all_ppr(1:4, :, :, :, :), 1));
+
+% optim_mat = ppr_intcvs_exc .* ppr_intcvs_inh;
+
+cmin = min(ppr_intcvs_exc(:));
+cmax = max(ppr_intcvs_exc(:));
+clims = [cmin cmax];
+figure(24); clf;
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(ppr_intcvs_exc(:, :, Ui, fi));
+        imagesc_cb(pd, ax, 'Greens', clims);
+        set(gca,'Yticklabel',[]) 
+        set(gca,'Xticklabel',[])
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+
+cmin = min(ppr_intcvs_inh(:));
+cmax = max(ppr_intcvs_inh(:));
+clims = [cmin cmax];
+figure(25); clf;
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(ppr_intcvs_inh(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Reds', clims);
         set(gca,'Yticklabel',[]) 
         set(gca,'Xticklabel',[])
