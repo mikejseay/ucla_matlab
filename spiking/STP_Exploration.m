@@ -61,19 +61,45 @@ for i=1:n_iter
     
 end
 
-%% reshape results
+% reshape results
 
 all_V2 = reshape(all_V, V_intended_dims);
 all_ppr = reshape(all_ppr_long, ppr_intended_dims);
 all_psp1 = reshape(all_psp1_long, ppr_intended_dims);
 all_psp2 = reshape(all_psp2_long, ppr_intended_dims);
 
+% calculate linear fits
+
+bexc_all = zeros(ppr_intended_dims(2:end));
+binh_all = zeros(ppr_intended_dims(2:end));
+r2exc_all = zeros(ppr_intended_dims(2:end));
+r2inh_all = zeros(ppr_intended_dims(2:end));
+
+x = (1:4)';
+X = [ones(size(x)) x];
+for tfi=1:n_tf
+    for tdi=1:n_td
+        for Ui=1:n_U
+            for fi=1:n_f
+                yexc = all_ppr(2:5, tfi, tdi, Ui, fi);
+                yinh = all_ppr(1:4, tfi, tdi, Ui, fi);
+                [bexc, ~, ~, ~, statsexc] = regress(yexc, X);
+                [binh, ~, ~, ~, statsinh] = regress(yinh, X);
+                bexc_all(tfi, tdi, Ui, fi) = bexc(2); % slope
+                binh_all(tfi, tdi, Ui, fi) = binh(2);
+                r2exc_all(tfi, tdi, Ui, fi) = statsexc(1); % r^2
+                r2inh_all(tfi, tdi, Ui, fi) = statsinh(1);
+            end
+        end
+    end
+end
+
 %% plot results (1)
 % display experiments across taus for a fixed U and f
 
 % set U and f
 Ui_use = 1;
-fi_use = 3;
+fi_use = 2;
 
 ymin = nanmin(all_V2(:));
 ymax = nanmax(all_V2(:));
@@ -156,8 +182,20 @@ for inti=1:n_intervals
             ax = subplot(n_U, n_f, d);
             pd = squeeze(all_ppr(inti, :, :, Ui, fi));
             imagesc_cb(pd, ax, 'Reds', clims);
-            set(gca,'Yticklabel',[]) 
-            set(gca,'Xticklabel',[])
+            if Ui == n_U
+                xticks(1:n_td);
+                xticklabels(td_vals);
+                set(gca,'Yticklabel',[]) 
+                xlabel('tau-dep');
+            elseif fi == 1
+                yticks(1:n_tf);
+                yticklabels(tf_vals);
+                set(gca,'Xticklabel',[])
+                ylabel('tau-fac');
+            else
+                set(gca,'Yticklabel',[]) 
+                set(gca,'Xticklabel',[])
+            end
             supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
             title(supi);
         end
@@ -180,8 +218,20 @@ for Ui=1:n_U
         ax = subplot(n_U, n_f, d);
         pd = squeeze(ppr_intcvs(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Reds', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
@@ -209,8 +259,20 @@ for Ui=1:n_U
         ax = subplot(n_U, n_f, d);
         pd = squeeze(comb_mat(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Reds', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
@@ -239,8 +301,20 @@ for Ui=1:n_U
         ax = subplot(n_U, n_f, d);
         pd = squeeze(comb_mat2(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Reds', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
@@ -267,8 +341,20 @@ for Ui=1:n_U
         ax = subplot(n_U, n_f, d);
         pd = squeeze(xadjint_means(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Reds', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
@@ -292,8 +378,20 @@ for Ui=1:n_U
         ax = subplot(n_U, n_f, d);
         pd = squeeze(ppr_intcvs_exc(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Greens', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
@@ -310,8 +408,20 @@ for Ui=1:n_U
         ax = subplot(n_U, n_f, d);
         pd = squeeze(ppr_intcvs_inh(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Reds', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
@@ -324,60 +434,257 @@ ppr_diffs = diff(all_ppr, 1, 1);
 ppr_intdiffcvs_exc = squeeze(std(ppr_diffs(2:4, :, :, :, :), 0, 1) ./ mean(ppr_diffs(2:4, :, :, :, :), 1));
 ppr_intdiffcvs_inh = squeeze(std(ppr_diffs(1:3, :, :, :, :), 0, 1) ./ mean(ppr_diffs(1:3, :, :, :, :), 1));
 
+%% plot linear fit results
 
-%% linear fit
-
-x = 1:4;
-for tfi=1:n_tf
-    for tdi=1:n_td
-        for Ui=1:n_U
-            for fi=1:n_f
-                y = all_ppr(2:5, tfi, tdi, Ui, fi);
-                
-            end
-        end
-    end
-end
-
-[b, bint, r, rint, stats] = regress(y, X);
-
-ppr_intcvs_exc = squeeze(std(all_ppr(2:5, :, :, :, :), 0, 1) ./ mean(all_ppr(2:5, :, :, :, :), 1));
-ppr_intcvs_inh = squeeze(std(all_ppr(1:4, :, :, :, :), 0, 1) ./ mean(all_ppr(1:4, :, :, :, :), 1));
-
-% optim_mat = ppr_intcvs_exc .* ppr_intcvs_inh;
-
-cmin = min(ppr_intcvs_exc(:));
-cmax = max(ppr_intcvs_exc(:));
+figure(31); clf;
+cmin = min(r2exc_all(:));
+cmax = max(r2exc_all(:));
 clims = [cmin cmax];
-figure(24); clf;
 d = 0;
 for Ui=1:n_U
     for fi=1:n_f
         d = d + 1;
         ax = subplot(n_U, n_f, d);
-        pd = squeeze(ppr_intcvs_exc(:, :, Ui, fi));
+        pd = squeeze(r2exc_all(:, :, Ui, fi));
         imagesc_cb(pd, ax, 'Greens', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
 end
+suptitle('R^2 across upper intervals');
 
-cmin = min(ppr_intcvs_inh(:));
-cmax = max(ppr_intcvs_inh(:));
+figure(32); clf;
+cmin = min(bexc_all(:));
+cmax = max(bexc_all(:));
 clims = [cmin cmax];
-figure(25); clf;
 d = 0;
 for Ui=1:n_U
     for fi=1:n_f
         d = d + 1;
         ax = subplot(n_U, n_f, d);
-        pd = squeeze(ppr_intcvs_inh(:, :, Ui, fi));
-        imagesc_cb(pd, ax, 'Reds', clims);
-        set(gca,'Yticklabel',[]) 
-        set(gca,'Xticklabel',[])
+        pd = squeeze(bexc_all(:, :, Ui, fi));
+        imagesc_cb(pd, ax, '*Greens', clims);
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
         supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
         title(supi);
     end
 end
+suptitle('Slope across upper intervals');
+
+figure(33); clf;
+cmin = min(r2inh_all(:));
+cmax = max(r2inh_all(:));
+clims = [cmin cmax];
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(r2inh_all(:, :, Ui, fi));
+        imagesc_cb(pd, ax, 'Reds', clims);
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+suptitle('R^2 across lower intervals');
+
+figure(34); clf;
+cmin = min(binh_all(:));
+cmax = max(binh_all(:));
+clims = [cmin cmax];
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(binh_all(:, :, Ui, fi));
+        imagesc_cb(pd, ax, '*Reds', clims);
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+suptitle('Slope across lower intervals');
+
+%% combining r^2 and slope
+
+
+figure(41); clf;
+cmin = min(r2exc_all(:));
+cmax = max(r2exc_all(:));
+clims = [cmin cmax];
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(r2exc_all(:, :, Ui, fi));
+        imagesc_cb(pd, ax, 'Greens', clims);
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+suptitle('R^2 across upper intervals');
+
+figure(42); clf;
+cmin = min(bexc_all(:));
+cmax = max(bexc_all(:));
+clims = [cmin cmax];
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(bexc_all(:, :, Ui, fi));
+        imagesc_cb(pd, ax, '*Greens', clims);
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+suptitle('Slope across upper intervals');
+
+figure(33); clf;
+cmin = min(r2inh_all(:));
+cmax = max(r2inh_all(:));
+clims = [cmin cmax];
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(r2inh_all(:, :, Ui, fi));
+        imagesc_cb(pd, ax, 'Reds', clims);
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+suptitle('R^2 across lower intervals');
+
+figure(34); clf;
+cmin = min(binh_all(:));
+cmax = max(binh_all(:));
+clims = [cmin cmax];
+d = 0;
+for Ui=1:n_U
+    for fi=1:n_f
+        d = d + 1;
+        ax = subplot(n_U, n_f, d);
+        pd = squeeze(binh_all(:, :, Ui, fi));
+        imagesc_cb(pd, ax, '*Reds', clims);
+        if Ui == n_U
+            xticks(1:n_td);
+            xticklabels(td_vals);
+            set(gca,'Yticklabel',[]) 
+            xlabel('tau-dep');
+        elseif fi == 1
+            yticks(1:n_tf);
+            yticklabels(tf_vals);
+            set(gca,'Xticklabel',[])
+            ylabel('tau-fac');
+        else
+            set(gca,'Yticklabel',[]) 
+            set(gca,'Xticklabel',[])
+        end
+        supi = ['U=', num2str(U_vals(Ui)), ' f=', num2str(f_vals(fi))];
+        title(supi);
+    end
+end
+suptitle('Slope across lower intervals');
+
+
