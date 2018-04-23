@@ -136,6 +136,46 @@ function [tRec, tFac, U, f] = stp_gui_SetSTPRegime(regime)
             tFac = 50;
             U = 0.2;
             f = 0.11;
+        case 'dep_strong'
+            tRec = 800;
+            tFac = 1;
+            U = 0.5;
+            f = 0.1;
+        case 'dep'
+            tRec = 400;
+            tFac = 25;
+            U = 0.4;
+            f = 0.1;
+        case 'dep_weak'
+            tRec = 200;
+            tFac = 50;
+            U = 0.3;
+            f = 0.15;
+        case 'fac_dep'
+            tRec = 200;
+            tFac = 200;
+            U = 0.25;
+            f = 0.3;
+        case 'fac_dep_weak'
+            tRec = 100;
+            tFac = 200;
+            U = 0.2;
+            f = 0.25;
+        case 'fac_weak'
+            tRec = 50;
+            tFac = 200;
+            U = 0.2;
+            f = 0.2;
+        case 'fac'
+            tRec = 25;
+            tFac = 400;
+            U = 0.15;
+            f = 0.15;
+        case 'fac_strong'
+            tRec = 1;
+            tFac = 800;
+            U = 0.1;
+            f = 0.1;
     end
 
 % --- Executes just before stp_gui is made visible.
