@@ -23,7 +23,6 @@ function IAF_STP_analytical2_gui_ms(t, spiketimes, trec, tfac, U, f, in)
 %%% CONSTANTS %%%
 do_plot = true;
 tau = 5;                            % membrane time constant
-SpikeAmp = 2;                       % spike amplitude
 Iin = zeros(1, length(t)) + in; 
 
 %%% VARIABLES %%%
@@ -145,8 +144,9 @@ if do_plot
     plot(util, 'g')
     plot(resources, 'r')
 %     plot(V, 'k', 'linewidth', 3)
-    plot(V, 'k')
+    Vnorm = V / abs(max(V));
+    plot(Vnorm, 'k')
     hold off;
     xlabel('Time (ms)');
-    ylim([0 1]);
+%     ylim([0 1]);
 end

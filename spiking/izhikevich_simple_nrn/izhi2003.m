@@ -9,9 +9,9 @@
 %   use MATLAB R13 or later. November 2003. San Diego, CA 
 
 %%
-figure;
+figure(1); clf;
 %%%%%%%%%%%%%%% regular spiking (RS) %%%%%%%%%%%%%%%%%%%%%%
-subplot(2,4,1) 
+% subplot(2,4,1) 
 a=0.02; b=0.2;  c=-65;  d=8;
 V=-63;  u=b*V;
 VV=[];  uu=[];
@@ -39,7 +39,69 @@ axis([0 max(tspan) -90 30])
 axis off;
 title('regular spiking (RS)');
 
+%%
+%%%%%%%%%%%%%%% fast spiking (FS) %%%%%%%%%%%%%%%%%%%%%%
+figure(2); clf;
+a=0.1; b=0.2;  c=-65;  d=2;
+V=-70;  u=b*V;
+VV=[];  uu=[];
+tau = 0.25; tspan = 0:tau:150;
+T1=tspan(end)/10;
+for t=tspan
+    if (t>T1) 
+        I=10;
+    else
+        I=0;
+    end;
+    V = V + tau*(0.04*V^2+5*V+140-u+I);
+    u = u + tau*a*(b*V-u);
+    if V > 30
+        VV(end+1)=30;
+        V = c;
+        u = u + d;
+    else
+        VV(end+1)=V;
+    end;
+    uu(end+1)=u;
+end;
+plot(tspan,VV,[0 T1 T1 max(tspan)],-90+[0 0 10 10]);
+axis([0 max(tspan) -90 30])
+axis off;
+title(' fast spiking (FS)');
 
+%%
+%%%%%%%%%%%%%%% low-threshold spiking (LTS) %%%%%%%%%%%%%%%%%%%%%%
+figure(3); clf;
+a=0.02; b=0.25;  c=-65;  d=2;
+V=-63;  u=b*V;
+VV=[];  uu=[];
+tau = 0.25; tspan = 0:tau:250;
+T1=1*tspan(end)/10;
+for t=tspan
+    if (t>T1) 
+        I=10.0;
+    else
+        I=0;
+    end;
+    V = V + tau*(0.04*V^2+5*V+140-u+I);
+    u = u + tau*a*(b*V-u);
+    if V > 30
+        VV(end+1)=30;
+        V = c;
+        u = u + d;
+    else
+        VV(end+1)=V;
+    end;
+    uu(end+1)=u;
+end;
+plot(tspan,VV,[0 T1 T1 max(tspan)],-90+[0 0 10 10]);
+axis([0 max(tspan) -90 30])
+axis off;
+title('low-threshold spiking (LTS)');
+
+
+
+%%
 %%%%%%%%%%%%%%% intrinsically bursting (IB) %%%%%%%%%%%%%%%%%%%%%%
 subplot(2,4,2) 
 a=0.02; b=0.2;  c=-55;  d=4;
@@ -99,34 +161,6 @@ axis off;
 title('chattering (CH)');
 
 
-%%%%%%%%%%%%%%% fast spiking (FS) %%%%%%%%%%%%%%%%%%%%%%
-subplot(2,4,4) 
-a=0.1; b=0.2;  c=-65;  d=2;
-V=-70;  u=b*V;
-VV=[];  uu=[];
-tau = 0.25; tspan = 0:tau:150;
-T1=tspan(end)/10;
-for t=tspan
-    if (t>T1) 
-        I=10;
-    else
-        I=0;
-    end;
-    V = V + tau*(0.04*V^2+5*V+140-u+I);
-    u = u + tau*a*(b*V-u);
-    if V > 30
-        VV(end+1)=30;
-        V = c;
-        u = u + d;
-    else
-        VV(end+1)=V;
-    end;
-    uu(end+1)=u;
-end;
-plot(tspan,VV,[0 T1 T1 max(tspan)],-90+[0 0 10 10]);
-axis([0 max(tspan) -90 30])
-axis off;
-title(' fast spiking (FS)');
 
 
 
@@ -222,34 +256,6 @@ axis off;
 title('resonator (RZ)');
 
 
-%%%%%%%%%%%%%%% low-threshold spiking (LTS) %%%%%%%%%%%%%%%%%%%%%%
-subplot(2,4,8) 
-a=0.02; b=0.25;  c=-65;  d=2;
-V=-63;  u=b*V;
-VV=[];  uu=[];
-tau = 0.25; tspan = 0:tau:250;
-T1=1*tspan(end)/10;
-for t=tspan
-    if (t>T1) 
-        I=10.0;
-    else
-        I=0;
-    end;
-    V = V + tau*(0.04*V^2+5*V+140-u+I);
-    u = u + tau*a*(b*V-u);
-    if V > 30
-        VV(end+1)=30;
-        V = c;
-        u = u + d;
-    else
-        VV(end+1)=V;
-    end;
-    uu(end+1)=u;
-end;
-plot(tspan,VV,[0 T1 T1 max(tspan)],-90+[0 0 10 10]);
-axis([0 max(tspan) -90 30])
-axis off;
-title('low-threshold spiking (LTS)');
 
 
 

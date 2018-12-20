@@ -16,6 +16,20 @@ if strcmp(testModel, 'RS')
 	figtitle = 'Layer 5 regular spiking (RS) pyramidal cell (fig 8.12)';
     C=100; k=0.7; vr=-60; vt=-40; vpeak=35; a=0.03; b=-2; c=-50; d=100; celltype=1;
 
+% FS - Layer 5 rat visual cortex fast-spiking (FS) interneuron (fig8.27 from 2007 book)
+elseif strcmp(testModel, 'FS')
+	T=100;
+	IinRange = [73.2,100,200,400];
+	figtitle = 'Fast-spiking (FS) interneuron (fig 8.27) ';
+	C=20; k=1; vr=-55; vt=-40; vpeak=25; a=0.2; b=-2; c=-45; d=-55; celltype=5;
+
+% LTS - Rat barrel cortex Low-threshold  spiking (LTS) interneuron (fig 8.25 from 2007 book)
+elseif strcmp(testModel, 'LTS')
+	T=320;
+	IinRange = [100,125,200,300];
+	figtitle = 'Low-threshold spiking (LTS) interneuron (fig 8.25)';
+	C=100; k=1; vr=-56; vt=-42; vpeak=40; a=0.03; b=8; c=-53; d=20; celltype=4;
+    
 % IB -  Layer 5 intrinsically bursting (IB) cell (fig 8.19 from 2007 book)
 elseif strcmp(testModel, 'IB')
 	T=600;
@@ -29,20 +43,6 @@ elseif strcmp(testModel, 'CH')
 	IinRange = [200,300,400,600];
 	figtitle = 'Cortical chattering (CH) cell  (fig 8.23)';
 	C=50; k=1.5; vr=-60; vt=-40; vpeak=25; a=0.03; b=1; c=-40; d=150; celltype=3;
-
-% LTS - Rat barrel cortex Low-threshold  spiking (LTS) interneuron (fig 8.25 from 2007 book)
-elseif strcmp(testModel, 'LTS')
-	T=320;
-	IinRange = [100,125,200,300];
-	figtitle = 'Low-threshold spiking (LTS) interneuron (fig 8.25)';
-	C=100; k=1; vr=-56; vt=-42; vpeak=40; a=0.03; b=8; c=-53; d=20; celltype=4;
-
-% FS - Layer 5 rat visual cortex fast-spiking (FS) interneuron (fig8.27 from 2007 book)
-elseif strcmp(testModel, 'FS')
-	T=100;
-	IinRange = [73.2,100,200,400];
-	figtitle = 'Fast-spiking (FS) interneuron (fig 8.27) ';
-	C=20; k=1; vr=-55; vt=-40; vpeak=25; a=0.2; b=-2; c=-45; d=-55; celltype=5;
 
 % TC - Cat dorsal LGN thalamocortical (TC) cell (fig 8.31 from 2007 book)
 elseif strcmp(testModel, 'TC')

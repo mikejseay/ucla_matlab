@@ -85,5 +85,6 @@ if (1)
    plot(RELEASE(:,2),'c')
    plot(RELEASE(:,3),'g')
    plot(RELEASE(:,4),'r')
-   plot(V,'k','linewidth',[3])
+%    plot(V,'k','linewidth',[3])
+   plot(V,'k')
 end
