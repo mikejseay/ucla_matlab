@@ -1,0 +1,10 @@
+expectationPDF = normpdf(0:100, 50, 10);
+expectationCDF = normcdf(0:100, 50, 10);
+expectationHazard = expectationPDF ./ (1 - expectationCDF);
+% expectationHazard2 = expectationPDF ./ (1 - expectationPDF);
+figure(1); clf;
+hold on;
+plot(normalize_magnitudes(expectationPDF));
+plot(expectationCDF);
+plot(normalize_magnitudes(expectationHazard));
+% plot(expectationHazard2);

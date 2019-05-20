@@ -1,4 +1,4 @@
-function y = SEM(x, dim)
+function y = nanSEM(x, dim)
 %SEM    Standard Error of the Mean.
 %   SEM = STD/n^2
 %   uses STD with FLAG=0, thus STD is calculated using (n-1)
@@ -16,4 +16,4 @@ if nargin < 2
 end
 
 n = size(x, dim);
-y = std(x, 0, dim) ./ sqrt(n);
+y = nanstd(x, 0, dim) ./ sqrt(n);

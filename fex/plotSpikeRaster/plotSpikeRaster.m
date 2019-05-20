@@ -340,7 +340,8 @@ else % Equivalent to elseif iscell(spikes).
     end
     trialIsVector = cellfun(@isvector,spikes);
     if sum(trialIsVector) < length(spikes)
-        error('Cells must contain 1 x N vectors of spike times.');
+%         error('Cells must contain 1 x N vectors of spike times.');
+        warning('Cells must contain 1 x N vectors of spike times.');
     end
     
     % Now make sure cell array is M x 1 and not 1 x M.
