@@ -20,11 +20,12 @@ function [data, dw, dd, hmfast, hmslow] = maudsStatesFest(data,f,fest,startsec,e
 
 %slowwindowsize = max(ceil(f/10),round((-5* fest + 17)/2 * f)); %250000; 
 slowwindowsize = max(ceil(f/10),round((8 - (2/fest)) * f)); %250000; 
-% slowwindowsize = 20000; %250000; 
+% slowwindowsize = 20000; % 250000; 
 
 fastwindowsize = ceil(slowwindowsize/60); %2500;        % window size of the fast moving average
 % fastwindowsize = ceil(slowwindowsize/30); %2500;        % window size of the fast moving average
-% fastwindowsize = 5000; %2500;        % window size of the fast moving average
+% fastwindowsize = 5000;  % 2500;        % window size of the fast moving average
+
 fprintf('slow window = %1.2f s, fast windows = %1.3f s\n', slowwindowsize / f, fastwindowsize / f);
 % fprintf('slow window = %d, fast windows = %d', slowwindowsize, fastwindowsize);
   

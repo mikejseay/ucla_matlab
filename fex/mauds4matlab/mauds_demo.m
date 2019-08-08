@@ -6,8 +6,8 @@ close all;
 
 %% take a data segment
 
-% useLimsInSeconds = [1 61];
-useLimsInSeconds = [61 91];
+useLimsInSeconds = [1 91];
+% useLimsInSeconds = [61 91];
 useSegment = dataLongMedf2(useLimsInSeconds(1) / dt:useLimsInSeconds(2) / dt - 1)';
 useTime = time(1:length(useSegment));
 % useTime = time(useLimsInSeconds(1) / dt:useLimsInSeconds(2) / dt - 1);
@@ -16,7 +16,7 @@ useTime = time(1:length(useSegment));
 
 F_EST = 1;
 
-[u_ons, u_off] = find_upstates(useSegment', dt, V_THRESH, DUR_THRESH, EXTENSION_THRESH);
+[u_ons, u_off] = find_upstates(useSegment, dt, V_THRESH, DUR_THRESH, EXTENSION_THRESH);
 u_dur = (u_off - u_ons) * dt;
 n_upstates = length(u_ons);
 
@@ -51,14 +51,23 @@ u_off_mauds_orig = dw(2:end, 1)';
 u_dur_mauds_filtered = (u_off_mauds_filtered(1:end - 1) - u_ons_mauds_filtered(1:end - 1)) * dt;
 n_upstates_maud_filtered = length(u_ons_mauds_filtered);
 
+
+% check out the STD method used by Mann et al. (2009)
+useSegmentDeviation = dataLongDeviation(useLimsInSeconds(1) / dt:useLimsInSeconds(2) / dt - 1);
+[u_ons_std, u_off_std] = find_upstates_std(useSegmentDeviation', dt, STD_THRESH, STD_THRESH_ONSET, DUR_THRESH, EXTENSION_THRESH);
+n_upstates_std = length(u_ons_std);
+
 % subplot(313);
 % hold on;
 % plot(useTime, useSegment);
 y1 = -10;
 y2 = 20;
-for ui = 1:n_upstates_maud_filtered
-    x1 = useTime(u_ons_mauds_filtered(ui));
-    x2 = useTime(u_off_mauds_filtered(ui));
+% for ui = 1:n_upstates_maud_filtered
+%     x1 = useTime(u_ons_mauds_filtered(ui));
+%     x2 = useTime(u_off_mauds_filtered(ui));
+for ui = 1:n_upstates_std
+    x1 = useTime(u_ons_std(ui));
+    x2 = useTime(u_off_std(ui));
     patch('Vertices', [x1, y1; x2, y1; x2, y2; x1, y2], ...
         'Faces', [1, 2, 3, 4], ...
         'FaceColor', 'red', 'FaceAlpha', 0.2, 'EdgeAlpha', 0);

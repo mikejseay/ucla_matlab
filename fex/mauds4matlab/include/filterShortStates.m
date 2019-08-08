@@ -22,18 +22,28 @@ function [states] = filterShortStates(states, minStateLength, f)
 minNumFrames = minStateLength * f; % frames
 
 i=1;
+% loop from i = 1 to the size of states
 while(i <= size(states, 1))
+    % happens rarely....
     while(i <= size(states, 1) && states(i,2) ~= 0 && states(i,2)-states(i,1) < minNumFrames)
         states(i,:) = [];
     end
     
+    % if the difference betweeen current potential start and next is less than the min
     if(i < size(states, 1) && states(i+1,1)-states(i,2) < minNumFrames)
+        % if last
         if(i == size(states, 1))
             states(i-1,2) = states(i,2);
             states(i,:) = [];
+        % if not last
         else
+            % shift values in left-hand column, starting from the one after the next (two ahead),
+            % up by one
             states(i+1:end-1,1) = states(i+2:end,1);
+            % shift values in right-hand column, starting from the the next (one ahead),
+            % up by one
             states(i:end-1,2) = states(i+1:end,2);
+            % since the last two rows are now identical, get rid of the last row
             states(end,:) = [];
         end
     else

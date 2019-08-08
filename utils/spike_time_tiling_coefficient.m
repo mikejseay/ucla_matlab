@@ -1,6 +1,6 @@
 function index = spike_time_tiling_coefficient(spiketrain_1, spiketrain_2, t_start, t_stop, dt)
 
-if nargin < 3
+if nargin < 5
     dt = 0.005;
 end
 

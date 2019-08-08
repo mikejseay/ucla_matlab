@@ -58,7 +58,8 @@ data = data + potentialoffset;
 hmfast = hmfast + potentialoffset;
 hmslow = hmslow + potentialoffset;
 
-if(boxed)    
+if(boxed)
+    % sampledata, f, dw, dd, hmfast, hmslow, FSL,FSN,XL,YL,medias,detectiontime,labels,XTick,YTick, pureonline, startdata, enddata, axisx1, axisx2
     plotboxmauds(data, f, dw, dd, hmfast, hmslow, 10, 7, 10, 10, showemas, 0, 1, 1, 1);
 else
     plotmauds(data, f, dw, dd, hmfast, hmslow, 15, 12, 10, 10, showemas, 0, 1, 1, 1);

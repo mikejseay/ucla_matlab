@@ -1,6 +1,10 @@
 function [slope, onset_pt, offset_pt] = ...
     estimate_slope_from_local_extrema_thresh2(x, t, height_thresh, width_thresh, do_plot)
 
+if isa(x, 'single')
+    x = double(x);
+end
+
 dt = t(2) - t(1);
 width_thresh = round(width_thresh ./ dt);
 
@@ -64,4 +68,12 @@ if do_plot
     scatter(t(vl_locs), vls);
     plot(t([vl_locs(mpdi), pk_locs(mpdi)]), [vls(mpdi), pks(mpdi)], '--');
     hold off;
+end
+
+if isempty(slope)
+    slope = NaN;
+    onset_pt = NaN;
+    offset_pt = NaN;
+end
+
 end

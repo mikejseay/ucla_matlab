@@ -4,7 +4,7 @@ function [uniq_vals, counts] = count_unique_elements(v)
 uniq_vals = unique(v);
 n_uniq_vals = length(uniq_vals);
 
-counts = zeros(1, n_uniq_vals);
+counts = zeros(n_uniq_vals, 1);
 for uvi=1:n_uniq_vals
     counts(uvi) = sum(v==uniq_vals(uvi));
 end

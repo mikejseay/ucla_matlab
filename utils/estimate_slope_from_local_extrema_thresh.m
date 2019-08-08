@@ -1,5 +1,9 @@
 function [slope, onset_pt, offset_pt] = estimate_slope_from_local_extrema_thresh(x, t, thresh, do_plot)
 
+if isa(x, 'single')
+    x = double(x);
+end
+
 [pks, pk_locs] = findpeaks(x);
 [vls, vl_locs] = findpeaks(-x);
 vls = -vls;
