@@ -1,4 +1,4 @@
-function out = meanx(in, except_dims)
+function out = nanmeanx(in, except_dims)
 
 %take a mean along all dimensions except those specified in except_dims
 %ex: a is 4 x 9 x 36
@@ -18,7 +18,7 @@ mean_dims = setdiff(1:n_dims, except_dims);
 out = in;
 clear in
 for d = mean_dims
-    out = mean(out, d);
+    out = nanmean(out, d);
 end
 out = squeeze(out);
 

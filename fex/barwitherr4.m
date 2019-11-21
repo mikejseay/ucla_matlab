@@ -71,28 +71,10 @@
 %
 %**************************************************************************
 
-function varargout = barwitherr(errors,varargin)
+function varargout = barwitherr2(errors, values, color, linestyle)
 
 % Check how the function has been called based on requirements for "bar"
-if nargin < 3
-    % This is the same as calling bar(y)
-    values = varargin{1};
-    xOrder = 1:size(values,1);
-else
-    % This means extra parameters have been specified
-    if isscalar(varargin{2}) || ischar(varargin{2})
-        % It is a width / property so the y values are still varargin{1}
-        values = varargin{1};
-        xOrder = 1:size(values,1);
-    else
-        % x-values have been specified so the y values are varargin{2}
-        % If x-values have been specified, they could be in a random order,
-        % get their indices in ascending order for use with the bar
-        % locations which will be in ascending order:
-        values = varargin{2};
-        [tmp xOrder] = sort(varargin{1});
-    end
-end
+xOrder = 1:size(values,1);
 
 % If an extra dimension is supplied for the errors then they are
 % assymetric split out into upper and lower:
@@ -115,7 +97,9 @@ if any(size(values) ~= size(lowerErrors))
 end
 
 [nRows nCols] = size(values);
-handles.bar = bar(varargin{:}, 'EdgeColor', 'none'); % standard implementation of bar fn
+% handles.bar = bar(values, 'FaceColor', color, 'EdgeColor', 'none'); % standard implementation of bar fn
+% handles.bar = bar(values, 'FaceColor', color, 'EdgeColor', 'k', 'LineStyle', linestyle); % standard implementation of bar fn
+handles.bar = bar(values, 'FaceColor', 'none', 'EdgeColor', color, 'LineWidth', 4); % standard implementation of bar fn
 hold on
 hBar = handles.bar;
 
@@ -135,7 +119,8 @@ if nRows > 1
         % Use the mean x values to call the standard errorbar fn; the
         % errorbars will now be centred on each bar; these are in ascending
         % order so use xOrder to ensure y values and errors are too:
-        hErrorbar(col) = errorbar(mean(x,1), values(xOrder,col), lowerErrors(xOrder,col), upperErrors(xOrder, col), '.k');
+        hErrorbar(col) = errorbar(mean(x,1), values(xOrder,col), lowerErrors(xOrder,col), upperErrors(xOrder, col), '.k', ...
+            'CapSize', 0, 'LineWidth', 1);
         set(hErrorbar(col), 'marker', 'none')
     end
 else
@@ -147,7 +132,8 @@ else
        x =  handles.bar.XData + [handles.bar.XOffset];
    end
     
-    hErrorbar = errorbar(mean(x,1), values, lowerErrors, upperErrors, '.k');
+    hErrorbar = errorbar(mean(x,1), values, lowerErrors, upperErrors, '.k', ...
+        'CapSize', 0, 'LineWidth', 1);
     set(hErrorbar, 'marker', 'none')
 end
 

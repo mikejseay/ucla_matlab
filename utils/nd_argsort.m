@@ -1,9 +1,12 @@
-function inds_mat = nd_argsort(M)
+function inds_mat = nd_argsort(M, order)
 
+if nargin < 2
+    order = 'ascend';
+end
 
 inds_mat = zeros(numel(M), length(size(M)));
 
-[~, I] = sort(M(:));
+[~, I] = sort(M(:), order);
 
 d = 0;
 for ind = I'

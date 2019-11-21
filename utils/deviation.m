@@ -1,7 +1,21 @@
-function x_Deviation = deviation(x, baselinePeriodInds)
+function x_deviation = deviation(x, baselinePeriodInds, dim)
+% create a version of x in which each value represents how far that value
+% deviates from the baseline mean in units of the standard deviation of the baseline
 
-x_BaselineMean = mean(x(:, baselinePeriodInds), 2);
-x_BaselineStd = std(x(:, baselinePeriodInds), 0, 2);
-x_Deviation = (x - x_BaselineMean) ./ x_BaselineStd;
+% baselinePeriodInds and dim tell which indices of which dim contain the baseline
+
+pre_colons = repmat({':'}, 1, dim - 1);
+post_colons = repmat({':'}, 1, ndims(x) - dim);
+
+x_baselineData = x(pre_colons{:}, baselinePeriodInds, post_colons{:});
+
+x_baselineMean = mean(x_baselineData, dim);
+x_baselineStd = std(x_baselineData, 0, dim);
+
+% set all STD values of 0 to be the global min... avoids division by zero
+minStd = min(x_baselineStd(x_baselineStd ~= 0));
+x_baselineStd(x_baselineStd == 0) = minStd;
+
+x_deviation = (x - x_baselineMean) ./ x_baselineStd;
 
 end

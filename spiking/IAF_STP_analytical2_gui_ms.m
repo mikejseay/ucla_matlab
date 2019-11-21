@@ -22,7 +22,7 @@ function IAF_STP_analytical2_gui_ms(t, spiketimes, trec, tfac, U, f, in)
 
 %%% CONSTANTS %%%
 do_plot = true;
-tau = 5;                            % membrane time constant
+tau = 30;                            % membrane time constant
 Iin = zeros(1, length(t)) + in; 
 
 %%% VARIABLES %%%

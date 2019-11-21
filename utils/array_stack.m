@@ -1,4 +1,4 @@
-function a_out = stack(a1, a2, dim)
+function a_out = array_stack(a1, a2, dim)
 % stack a1 and a2 along a new dimension
 % dim of -1 indicates the end
 
