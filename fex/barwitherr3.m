@@ -71,7 +71,7 @@
 %
 %**************************************************************************
 
-function varargout = barwitherr2(errors, values, color, linestyle)
+function varargout = barwitherr3(errors, values, color, linestyle)
 
 % Check how the function has been called based on requirements for "bar"
 xOrder = 1:size(values,1);
